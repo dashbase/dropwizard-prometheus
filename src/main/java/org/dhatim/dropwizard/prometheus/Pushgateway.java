@@ -77,6 +77,7 @@ public class Pushgateway implements PrometheusSender {
             this.writer = new PrometheusTextWriter(new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)));
             this.exporter = new DropwizardMetricsExporter(writer);
             this.connection = conn;
+            LOG.debug("Prometheus server connected: {}", targetUrl);
         }
     }
 
@@ -108,7 +109,11 @@ public class Pushgateway implements PrometheusSender {
     @Override
     public void flush() throws IOException {
         if (writer != null) {
-            writer.flush();
+            try {
+                writer.flush();
+            } finally {
+                LOG.debug("metrics flushed");
+            }
         }
     }
 
